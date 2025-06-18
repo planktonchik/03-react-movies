@@ -7,6 +7,7 @@ interface MovieHttpResponse {
 
 const URL = "https://api.themoviedb.org/3/search/movie";
 const token = import.meta.env.VITE_TMDB_TOKEN;
+console.log("TOKEN:", token);
 
 export const fetchMovies = async (query: string): Promise<Movie[]> => {
   console.log("Token:", token);
@@ -19,8 +20,7 @@ export const fetchMovies = async (query: string): Promise<Movie[]> => {
     },
     headers: {
       accept: "application/json",
-      Authorization:
-        "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIzMGU2N2U3N2IyYWQzN2VlOTY0ZjBmOGQ1OGQ1MmFiOCIsIm5iZiI6MTc1MDI1MDQ4My45MjksInN1YiI6IjY4NTJiM2YzZjlmYTA4ZjA5MmJiZGJkMCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.2bc3gUkSt7QYbk1OCNS5djsJTAo2wug5FcO9T-79NuE",
+      Authorization: `Bearer ${token}`,
     },
   });
   return response.data.results;
