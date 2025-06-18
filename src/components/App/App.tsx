@@ -1,51 +1,62 @@
+import css from "./App.module.css";
 import { useState } from "react";
 import SearchBar from "../SearchBar/SearchBar";
 import MovieGrid from "../MovieGrid/MovieGrid";
-import MovieModal from "../MovieModal/MovieModal";
 import Loader from "../Loader/Loader";
 import ErrorMessage from "../ErrorMessage/ErrorMessage";
+import MovieModal from "../MovieModal/MovieModal";
 import { fetchMovies } from "../../services/movieService";
 import type { Movie } from "../../types/movie";
 import toast, { Toaster } from "react-hot-toast";
 
-function App() {
+export default function App() {
   const [movies, setMovies] = useState<Movie[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isError, setIsError] = useState<boolean>(false);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(false);
 
-  const handleSearch = async (query: string) => {
-    setLoading(true);
-    setError(false);
-    setMovies([]);
+  const handleSubmit = async (query: string) => {
     try {
+      setIsLoading(true);
+      setIsError(false);
+      setMovies([]);
       const data = await fetchMovies(query);
+
       if (data.length === 0) {
-        toast("❌ No movies found for your request.");
+        toast(`No movies found for your request.`);
+        return;
       }
+
       setMovies(data);
     } catch {
-      setError(true);
+      setIsError(true);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
+
+  const handleSelect = (movie: Movie) => {
+    setSelectedMovie(movie);
+    setIsModalOpen(true);
+  };
+  const handleClose = () => {
+    setIsModalOpen(false);
+    setSelectedMovie(null);
+  };
+
   return (
-    <>
-      <SearchBar onSubmit={handleSearch} />
-      <Toaster position="top-center" />
-      {loading && <Loader />}
-      {error && <ErrorMessage />}
-      {!loading && !error && movies.length > 0 && (
-        <MovieGrid movies={movies} onSelect={setSelectedMovie} />
+    <div className={css.app}>
+      <SearchBar onSubmit={handleSubmit} />
+      {movies.length > 0 && (
+        <MovieGrid onSelect={handleSelect} movies={movies} />
       )}
-      {selectedMovie && (
-        <MovieModal
-          movie={selectedMovie}
-          onClose={() => setSelectedMovie(null)}
-        />
+      {isLoading && <Loader />}
+      {isError && <ErrorMessage />}
+      {isModalOpen && selectedMovie && (
+        <MovieModal movie={selectedMovie} onClose={handleClose} />
       )}
-    </>
+      <Toaster />
+    </div>
   );
 }
-export default App;

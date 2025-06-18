@@ -1,12 +1,13 @@
-import type { Movie } from "../../types/movie";
 import css from "./MovieGrid.module.css";
+import type { Movie } from "../../types/movie";
+import { imgURL } from "../../services/movieService";
 
 interface MovieGridProps {
-  movies: Movie[];
   onSelect: (movie: Movie) => void;
+  movies: Movie[];
 }
 
-function MovieGrid({ movies, onSelect }: MovieGridProps) {
+export default function MovieGrid({ onSelect, movies }: MovieGridProps) {
   return (
     <ul className={css.grid}>
       {movies.map((movie) => (
@@ -14,7 +15,7 @@ function MovieGrid({ movies, onSelect }: MovieGridProps) {
           <div className={css.card}>
             <img
               className={css.image}
-              src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+              src={`${imgURL}${movie.poster_path}`}
               alt={movie.title}
               loading="lazy"
             />
@@ -25,5 +26,3 @@ function MovieGrid({ movies, onSelect }: MovieGridProps) {
     </ul>
   );
 }
-
-export default MovieGrid;
